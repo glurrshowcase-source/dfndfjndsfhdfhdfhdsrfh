@@ -1,4 +1,4 @@
-name: Build GxLx 1.1.2 from ZIP
+name: Build GxLx 1.1.3 from ZIP
 
 on:
   push:
@@ -26,6 +26,106 @@ jobs:
             throw 'The ZIP does not contain GxLx-1.1.2/CMakeLists.txt.'
           }
 
+      - name: Apply GxLx 1.1.3 description and branding
+        shell: pwsh
+        run: |
+          $project = 'extracted/GxLx-1.1.2'
+          $metaPath = Join-Path $project 'mod.json'
+          $meta = Get-Content -LiteralPath $metaPath -Raw | ConvertFrom-Json
+          $meta.version = 'v1.1.3'
+          $meta.developers = @('GxLx')
+          $meta.links = [pscustomobject]@{ homepage = 'https://www.youtube.com/@DJakDoki' }
+          $meta.description = 'GxLx - a red-and-black ImGui mod menu for Geometry Dash on Windows.'
+          $meta | ConvertTo-Json -Depth 50 | Set-Content -LiteralPath $metaPath -Encoding utf8
+
+          $about = @'
+          # GxLx 1.1.3
+          
+          **GxLx** is a red-and-black mod menu for Geometry Dash, with an ImGui-only interface, animations, and gameplay and editor tools.
+          
+          **Compatibility:** Windows x64 · Geometry Dash 2.2081 · Geode 5.11.2.
+          
+          ## How to use
+          
+          1. Press **Tab** to open or close GxLx. Change this in **Geode → GxLx → Menu Keybind**, if needed.
+          2. Choose a category and configure your options.
+          3. Press Tab again to return to the game.
+          
+          ## Features
+          
+          - ImGui interface with the fixed GxLx red-and-black theme
+          - Animated menu opening and closing
+          - Configurable menu keybind
+          - Gameplay, bypass, visual and creator tools
+          - StartPos Switcher, labels, trajectory display and Replay Bot
+          - Recording and other utilities where supported
+          
+          *Some functions require optional dependencies and may not be available in every installation.*
+          
+          ## Developer
+          
+          **GxLx**
+          
+          ## Links
+          
+          **[GxLx on YouTube — @DJakDoki](https://www.youtube.com/@DJakDoki)**
+          
+          ## License
+          
+          GxLx includes modified open-source components distributed under the **[Eclipse Public License 2.0](https://www.eclipse.org/legal/epl-2.0/)** (EPL-2.0). The original authorship and attribution notices are preserved in the bundled `LICENSE.md`, `NOTICE-GXLX.md` and `README-UPSTREAM.md`.
+          '@
+          Set-Content -LiteralPath (Join-Path $project 'about.md') -Value $about -Encoding utf8
+
+          $support = @'
+          # GxLx
+          
+          **Developer:** GxLx
+          
+          **YouTube:** [@DJakDoki](https://www.youtube.com/@DJakDoki)
+          
+          For troubleshooting, include your GxLx version and Geode logs/crashlogs.
+          
+          The original code license and attribution remain bundled with the distribution.
+          '@
+          Set-Content -LiteralPath (Join-Path $project 'support.md') -Value $support -Encoding utf8
+
+          $changelog = @'
+          # GxLx 1.1.3 — 2026-11-08
+          
+          - Replaced the Geode description and feature list with GxLx information.
+          - Set GxLx as the sole displayed developer.
+          - Replaced the previous site link with the @DJakDoki YouTube channel.
+          - Preserved original authorship and license notices in the bundled legal documents.
+          
+          ## GxLx 1.1.2 — 2026-11-08
+          
+          - Fixed the menu to use the GxLx/Slaughterhouse presentation only.
+          - Removed theme selection, Reload Fonts and the Slaughterhouse/Grief header.
+          
+          ## GxLx 1.1.1 — 2026-11-08
+          
+          - Removed the alternative Cocos renderer, leaving ImGui only.
+          
+          ## GxLx 1.1.0 — 2026-11-08
+          
+          - Added animations, GxLx logo, audio cue, menu keybind and loading cover.
+          
+          Original project history is preserved in the bundled upstream documents.
+          '@
+          Set-Content -LiteralPath (Join-Path $project 'changelog.md') -Value $changelog -Encoding utf8
+
+          $cmake = Join-Path $project 'CMakeLists.txt'
+          $cmakeContent = Get-Content -LiteralPath $cmake -Raw
+          $cmakeContent = $cmakeContent.Replace('project(GxLx VERSION 1.1.2 LANGUAGES CXX)', 'project(GxLx VERSION 1.1.3 LANGUAGES CXX)')
+          Set-Content -LiteralPath $cmake -Value $cmakeContent -Encoding utf8
+
+          $notice = Join-Path $project 'NOTICE-GXLX.md'
+          Add-Content -LiteralPath $notice -Encoding utf8 -Value "`nVersion 1.1.3 customizes the public Geode description and developer metadata. The original authorship and source attributions remain preserved in this notice and upstream documents."
+
+          if ($meta.developers.Count -ne 1 -or $meta.developers[0] -ne 'GxLx') { throw 'Developer metadata not updated' }
+          if ($meta.version -ne 'v1.1.3') { throw 'Version metadata not updated' }
+          if ((Get-Content -Raw (Join-Path $project 'about.md')) -match 'Original Eclipse Menu description') { throw 'Old description remains' }
+
       - name: Build Geode mod for Windows
         id: build
         uses: geode-sdk/build-geode-mod@main
@@ -44,6 +144,6 @@ jobs:
       - name: Upload built .geode
         uses: actions/upload-artifact@v4
         with:
-          name: GxLx-1.1.2-Windows
+          name: GxLx-1.1.3-Windows
           path: ${{ steps.build.outputs.build-output }}/*.geode
           if-no-files-found: error
