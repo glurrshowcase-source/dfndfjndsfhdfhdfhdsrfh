@@ -1,0 +1,49 @@
+name: Build GxLx 1.1.2 from ZIP
+
+on:
+  push:
+    paths:
+      - 'GxLx-1.1.2-GitHub-Actions.zip'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 120
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Unzip GxLx sources
+        shell: pwsh
+        run: |
+          if (!(Test-Path 'GxLx-1.1.2-GitHub-Actions.zip')) {
+            throw 'Upload GxLx-1.1.2-GitHub-Actions.zip to the repository root first.'
+          }
+          Expand-Archive -LiteralPath 'GxLx-1.1.2-GitHub-Actions.zip' -DestinationPath extracted -Force
+          if (!(Test-Path 'extracted/GxLx-1.1.2/CMakeLists.txt')) {
+            throw 'The ZIP does not contain GxLx-1.1.2/CMakeLists.txt.'
+          }
+
+      - name: Build Geode mod for Windows
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          sdk: 5.11.2
+          path: extracted/GxLx-1.1.2
+          target: Win64
+          bindings: geode-sdk/bindings
+          bindings-ref: 3e65294e5b68f0124cde08505b9ecbeb2e3d990b
+          build-config: Release
+          configure-args: >-
+            -DECLIPSE_ENABLE_UNITY_BUILD=ON
+            -DSKIP_BUILDING_CODEGEN=OFF
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+
+      - name: Upload built .geode
+        uses: actions/upload-artifact@v4
+        with:
+          name: GxLx-1.1.2-Windows
+          path: ${{ steps.build.outputs.build-output }}/*.geode
+          if-no-files-found: error
