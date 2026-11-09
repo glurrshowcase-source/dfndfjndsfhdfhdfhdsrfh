@@ -1,23 +1,25 @@
-# GxLx 1.1.5 — Windows build
+# GxLx 1.1.7
 
-This repository contains a GitHub Actions workflow that builds the **GxLx 1.1.5** Geode mod for Geometry Dash 2.2081 on Windows x64 (Geode 5.11.2).
+Windows x64 Geode mod for Geometry Dash 2.2081 (Geode 5.11.2).
 
-## Build
+## Build via GitHub Actions
 
-1. Upload exactly one file **GxLx-1.1.5-GitHub-Actions.zip** to the repository root via **Add file → Upload files → Commit changes**. Do not unzip it.
-2. GitHub Actions automatically builds the mod (workflow **Build GxLx 1.1.5 Windows**).
-3. After the build succeeds, open **Actions → latest successful run → Artifacts → GxLx-1.1.5-Windows**.
-4. Extract `gxlx.menu.geode` to `Geometry Dash/geode/mods/` while the game is closed.
+1. Upload the single archive **GxLx-1.1.7-GitHub-Actions.zip** to the root of this repository (**Add file → Upload files → Commit changes**). Do not unpack it.
+2. Workflow **Build GxLx 1.1.7 Windows** runs when that ZIP is added.
+3. After successful build, open **Actions → run → Artifacts → GxLx-1.1.7-Windows**.
+4. Unpack `gxlx.menu.geode` into `Geometry Dash/geode/mods/` with the game closed.
 
-## What's new
+## Custom loading cover
 
-- 10 menu-key presses within 10 seconds play `10clicks.mp4` over the game until the video ends.
-- Press the keys **G X L X** in sequence to enter level **151673976** directly (downloads it if needed).
-- Neon red loading bar and `sevvend.mp3` music.
-- Reduced menu window sizes and searchable GxLx hack/options names.
+- User-supplied `loading_screen.png` fills the loading scene.
+- Bar uses a fiery, animated progress indicator derived from the supplied `loading_bar.png`.
+- `loading_sound.mp3` is played during loading and stopped at 100% or on scene exit.
+- Actual Geometry Dash loading progress drives the bar, not a timer.
 
-**Platform limitation:** The video player is based on Windows Media Foundation and has not been runtime-tested in exclusive fullscreen. This package contains a resized 720p version of the supplied video to keep the archive uploadable via GitHub's web UI.
+All earlier GxLx menu features remain in the source archive.
 
 ## Licensing
 
-The modified upstream C++ code remains subject to EPL-2.0 and its original notices. The separate GxLx license applies solely to material originally owned by GxLx.
+Original upstream EPL-2.0 and attribution notices remain applicable. The GxLx original works license applies only to GxLx-owned new material.
+
+Source archive compilation and runtime behavior are not verified until the new workflow completes.
