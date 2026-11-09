@@ -1,0 +1,1 @@
+GxLx 1.1.8 loading bar fix will be applied by GitHub Actions.
