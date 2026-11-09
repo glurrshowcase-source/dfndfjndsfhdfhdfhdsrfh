@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'GxLx-1.1.7-GitHub-Actions.zip'
+      - '.github/workflows/build.yml'
   workflow_dispatch:
 
 jobs:
@@ -21,7 +22,15 @@ jobs:
           if (!(Test-Path -LiteralPath $archive)) {
             throw 'Upload GxLx-1.1.7-GitHub-Actions.zip to the repository root.'
           }
-          Expand-Archive -LiteralPath $archive -DestinationPath extracted -Force
+          Write-Host 'Checking uploaded archive before compilation'
+          $archiveInfo = Get-Item -LiteralPath $archive
+          Write-Host "Archive bytes: $($archiveInfo.Length)"
+          try {
+            Expand-Archive -LiteralPath $archive -DestinationPath extracted -Force
+          } catch {
+            Write-Error "Could not unpack ZIP: $($_.Exception.Message)"
+            throw
+          }
           $project = 'extracted/GxLx-1.1.7'
           foreach ($relativePath in @('CMakeLists.txt', 'mod.json', 'src/modules/gxlx/loading.cpp', 'resources/GxLx/loading-screen.png', 'resources/GxLx/loading-bar-frame.png', 'resources/GxLx/loading-bar-outline.png', 'resources/GxLx/loading-bar-fire.png', 'resources/GxLx/loading-bar-head.png', 'resources/GxLx/loading-sound.mp3')) {
             if (!(Test-Path -LiteralPath (Join-Path $project $relativePath))) {
