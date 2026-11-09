@@ -14,7 +14,7 @@ jobs:
       - name: Check out project
         uses: actions/checkout@v4
 
-      - name: Unpack 1.1.5 sources
+      - name: Unpack 1.1.6 sources
         shell: pwsh
         run: |
           $archive = 'GxLx-1.1.6-GitHub-Actions.zip'
@@ -22,7 +22,7 @@ jobs:
             throw 'Upload GxLx-1.1.6-GitHub-Actions.zip to the repository root.'
           }
           Expand-Archive -LiteralPath $archive -DestinationPath extracted -Force
-          $project = 'extracted/GxLx-1.1.5'
+          $project = 'extracted/GxLx-1.1.6'
           foreach ($relativePath in @('mod.json', 'CMakeLists.txt', 'src/modules/gxlx/easter-eggs.cpp', 'resources/GxLx/10clicks.mp4', 'resources/GxLx/sevvend.mp3', 'resources/GxLx/loading-logo.png')) {
             if (!(Test-Path -LiteralPath (Join-Path $project $relativePath))) {
               throw "Missing build file: $relativePath"
@@ -37,7 +37,7 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         with:
           sdk: 5.11.2
-          path: extracted/GxLx-1.1.5
+          path: extracted/GxLx-1.1.6
           target: Win64
           bindings: geode-sdk/bindings
           bindings-ref: 3e65294e5b68f0124cde08505b9ecbeb2e3d990b
