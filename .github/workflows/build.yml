@@ -1,9 +1,9 @@
-name: Build GxLx 1.1.6 Windows
+name: Build GxLx 1.1.7 Windows
 
 on:
   push:
     paths:
-      - 'GxLx-1.1.6-GitHub-Actions.zip'
+      - 'GxLx-1.1.7-GitHub-Actions.zip'
   workflow_dispatch:
 
 jobs:
@@ -11,33 +11,33 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 120
     steps:
-      - name: Check out project
+      - name: Check out source archive
         uses: actions/checkout@v4
 
-      - name: Unpack 1.1.6 sources
+      - name: Unpack GxLx 1.1.7
         shell: pwsh
         run: |
-          $archive = 'GxLx-1.1.6-GitHub-Actions.zip'
+          $archive = 'GxLx-1.1.7-GitHub-Actions.zip'
           if (!(Test-Path -LiteralPath $archive)) {
-            throw 'Upload GxLx-1.1.6-GitHub-Actions.zip to the repository root.'
+            throw 'Upload GxLx-1.1.7-GitHub-Actions.zip to the repository root.'
           }
           Expand-Archive -LiteralPath $archive -DestinationPath extracted -Force
-          $project = 'extracted/GxLx-1.1.6'
-          foreach ($relativePath in @('mod.json', 'CMakeLists.txt', 'src/modules/gxlx/easter-eggs.cpp', 'resources/GxLx/10clicks.mp4', 'resources/GxLx/sevvend.mp3', 'resources/GxLx/loading-logo.png')) {
+          $project = 'extracted/GxLx-1.1.7'
+          foreach ($relativePath in @('CMakeLists.txt', 'mod.json', 'src/modules/gxlx/loading.cpp', 'resources/GxLx/loading-screen.png', 'resources/GxLx/loading-bar-frame.png', 'resources/GxLx/loading-bar-outline.png', 'resources/GxLx/loading-bar-fire.png', 'resources/GxLx/loading-bar-head.png', 'resources/GxLx/loading-sound.mp3')) {
             if (!(Test-Path -LiteralPath (Join-Path $project $relativePath))) {
-              throw "Missing build file: $relativePath"
+              throw "Missing file: $relativePath"
             }
           }
-          $json = Get-Content -Raw (Join-Path $project 'mod.json') | ConvertFrom-Json
-          if ($json.version -ne 'v1.1.6') { throw 'Archive does not contain version 1.1.5' }
-          Write-Host 'Verified GxLx 1.1.6 code and media assets'
+          $meta = Get-Content -Raw (Join-Path $project 'mod.json') | ConvertFrom-Json
+          if ($meta.version -ne 'v1.1.7') { throw 'Wrong version in source ZIP' }
+          Write-Host 'Verified GxLx 1.1.7 source and media.'
 
-      - name: Build GxLx Windows x64
+      - name: Build Geode mod for Windows x64
         id: build
         uses: geode-sdk/build-geode-mod@main
         with:
           sdk: 5.11.2
-          path: extracted/GxLx-1.1.6
+          path: extracted/GxLx-1.1.7
           target: Win64
           bindings: geode-sdk/bindings
           bindings-ref: 3e65294e5b68f0124cde08505b9ecbeb2e3d990b
@@ -47,9 +47,9 @@ jobs:
             -DSKIP_BUILDING_CODEGEN=OFF
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
-      - name: Save compiled mod
+      - name: Save built .geode
         uses: actions/upload-artifact@v4
         with:
-          name: GxLx-1.1.6-Windows
+          name: GxLx-1.1.7-Windows
           path: ${{ steps.build.outputs.build-output }}/*.geode
           if-no-files-found: error
