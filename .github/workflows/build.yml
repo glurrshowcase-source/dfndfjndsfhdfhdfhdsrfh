@@ -29,7 +29,7 @@ jobs:
             }
           }
           $json = Get-Content -Raw (Join-Path $project 'mod.json') | ConvertFrom-Json
-          if ($json.version -ne 'v1.1.5') { throw 'Archive does not contain version 1.1.5' }
+          if ($json.version -ne 'v1.1.6') { throw 'Archive does not contain version 1.1.5' }
           Write-Host 'Verified GxLx 1.1.6 code and media assets'
 
       - name: Build GxLx Windows x64
